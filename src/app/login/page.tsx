@@ -15,11 +15,9 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      let redirectUrl = `${window.location.origin}/api/auth/callback`;
-      // Si estamos en localhost pero el servidor funciona con IP, usa la IP
-      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-        redirectUrl = `http://169.254.83.107:3000/api/auth/callback`;
-      }
+      const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+      const base = projectRef ? `https://${projectRef}.functions.supabase.co` : '';
+      let redirectUrl = base ? `${base}/auth_callback` : `${window.location.origin}/api/auth/callback`;
       const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectUrl } });
       if (error) throw error;
       setSent(true);

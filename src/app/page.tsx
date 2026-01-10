@@ -50,19 +50,22 @@ export default function Home() {
   const [maxYear, setMaxYear] = useState(2026);
   const [searchQuery, setSearchQuery] = useState('');
   const [statsCount, setStatsCount] = useState(0);
+  const [viewMode, setViewMode] = useState<'catalog' | 'recommendations'>('catalog');
 
   const minSliderRef = useRef<HTMLInputElement>(null);
   const maxSliderRef = useRef<HTMLInputElement>(null);
   const debounceTimer = useRef<NodeJS.Timeout>(null);
+  
+  const supabase = getSupabaseBrowser();
+
   // Check auth on mount
   useEffect(() => {
-    const supabase = getSupabaseBrowser();
     supabase.auth.getUser().then(({ data }) => setIsLoggedIn(!!data.user));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setIsLoggedIn(!!session?.user);
     });
     return () => { sub.subscription?.unsubscribe?.(); };
-  }, []);
+  }, [supabase]);
 
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
@@ -71,9 +74,9 @@ export default function Home() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/stats');
-      const data = await res.json();
-      setStatsCount(data.count);
+      const { data, error } = await supabase.functions.invoke('stats');
+      if (error) console.error(error);
+      if (data) setStatsCount(data.count);
     } catch (e) {
       console.error(e);
     }
@@ -81,16 +84,28 @@ export default function Home() {
 
   const loadCatalog = useCallback(async (reset = false) => {
     setLoading(true);
+    if (reset) setViewMode('catalog'); // Ensure we are in catalog mode when resetting (filters/search)
+    
     const p = reset ? 1 : page;
     
     try {
-      const url = searchQuery 
-        ? `/api/search_manual?q=${encodeURIComponent(searchQuery)}`
-        : `/api/catalog?page=${p}&type=${mediaType}&min_year=${minYear}&max_year=${maxYear}`;
-        
-      const res = await fetch(url);
-      const data = await res.json();
+      let resData;
+      if (searchQuery) {
+        const { data, error } = await supabase.functions.invoke('search_manual', {
+            body: { q: searchQuery }
+        });
+        if (error) throw error;
+        resData = data;
+      } else {
+        const { data, error } = await supabase.functions.invoke('catalog', {
+            body: { page: p, type: mediaType, min_year: minYear, max_year: maxYear }
+        });
+        if (error) throw error;
+        resData = data;
+      }
       
+      const data = resData || [];
+
       if (reset) {
         setCatalog(data);
       } else {
@@ -105,7 +120,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery, mediaType, minYear, maxYear]);
+  }, [page, searchQuery, mediaType, minYear, maxYear, supabase]);
 
   useEffect(() => {
     fetchStats();
@@ -113,13 +128,17 @@ export default function Home() {
   }, [loadCatalog]);
 
   useEffect(() => {
-    if (page > 1) {
+    if (page > 1 && viewMode === 'catalog') {
       loadCatalog(false);
     }
-  }, [page, loadCatalog]);
+  }, [page, viewMode, loadCatalog]);
 
   const loadMore = () => {
-    setPage(prev => prev + 1);
+    if (viewMode === 'recommendations') {
+      getRecommendations(true);
+    } else {
+      setPage(prev => prev + 1);
+    }
   };
 
   const bringToFront = (type: 'min' | 'max') => {
@@ -178,9 +197,14 @@ export default function Home() {
     setLoadingProviders(true);
     setProviders([]);
     try {
-      const res = await fetch(`/api/providers?id=${item.id}&type=${item.media_type}`);
-      const data = await res.json();
-      setProviders(data);
+      const { data, error } = await supabase.functions.invoke('providers', {
+        body: { id: item.id, type: item.media_type }
+      });
+      if (!error && data) {
+         setProviders(data);
+      } else {
+         setProviders([]);
+      }
     } catch {
       setProviders([]);
     } finally {
@@ -203,28 +227,39 @@ export default function Home() {
       item.id === selectedItem.id ? { ...item, my_score: newScore, status: 'seen' } : item
     ));
 
-    await fetch('/api/rate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    await supabase.functions.invoke('rate', {
+      body: {
         id: selectedItem.id,
         title: selectedItem.title,
         media_type: selectedItem.media_type,
         rating_type: ratingType
-      })
+      }
     });
     
     fetchStats();
     setSelectedItem(null);
   };
 
-  const getRecommendations = async () => {
+  const getRecommendations = async (append = false) => {
     setLoading(true);
-    setSearchQuery('');
+    if (!append) setSearchQuery('');
+    setViewMode('recommendations');
+    
     try {
-      const res = await fetch('/api/recommend');
-      const data = await res.json();
-      setCatalog(data.map((item: Item) => ({ ...item, media_type: item.media_type || 'movie' })));
+      const { data, error } = await supabase.functions.invoke('recommend');
+      if (error) throw error;
+      
+      const newItems = (data || []).map((item: Item) => ({ ...item, media_type: item.media_type || 'movie' }));
+      
+      if (append) {
+        setCatalog((prev) => {
+           const existingIds = new Set(prev.map(p => p.id));
+           const uniqueNew = newItems.filter((i: Item) => !existingIds.has(i.id));
+           return [...prev, ...uniqueNew];
+        });
+      } else {
+        setCatalog(newItems);
+      }
     } catch {
       alert("Valora más contenido");
     } finally {
@@ -303,7 +338,7 @@ export default function Home() {
 
             <div className="hidden md:flex gap-3 items-center">
               <AuthButton />
-              <button onClick={getRecommendations} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105">
+              <button onClick={() => getRecommendations()} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105">
                 <i className="fas fa-magic mr-1"></i> IA
               </button>
               <div className="text-right ml-2">
