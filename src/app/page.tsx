@@ -24,20 +24,20 @@ type Provider = {
   type: string;
 };
 
-type RatingType = 'SuperLike' | 'Like' | 'Dislike' | 'MegaDislike';
+type RatingType = 'SuperLike' | 'Like' | 'Dislike' | 'Odio';
 
 const RATING_MAP: Record<RatingType, number> = {
   'SuperLike': 5,
   'Like': 2,
   'Dislike': -2,
-  'MegaDislike': -5
+  'Odio': -5
 };
 
 const ICON_MAP: Record<RatingType, string> = {
   'SuperLike': 'fa-heart',
   'Like': 'fa-thumbs-up',
   'Dislike': 'fa-thumbs-down',
-  'MegaDislike': 'fa-skull'
+  'Odio': 'fa-skull'
 };
 
 export default function Home() {
@@ -314,7 +314,7 @@ export default function Home() {
             <div className="flex gap-4 items-center w-full md:w-auto justify-center md:justify-end">
               <div className="flex bg-gray-900 p-1 rounded-lg border border-gray-800 h-9 items-center">
                 <button onClick={() => setFilter('all')} className={`px-4 py-1 text-xs font-bold rounded h-full flex items-center transition-all ${mediaType === 'all' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}>TODO</button>
-                <button onClick={() => setFilter('movie')} className={`px-4 py-1 text-xs font-bold rounded h-full flex items-center transition-all ${mediaType === 'movie' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>PELIS</button>
+                <button onClick={() => setFilter('movie')} className={`px-4 py-1 text-xs font-bold rounded h-full flex items-center transition-all ${mediaType === 'movie' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>PELÍCULAS</button>
                 <button onClick={() => setFilter('tv')} className={`px-4 py-1 text-xs font-bold rounded h-full flex items-center transition-all ${mediaType === 'tv' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>SERIES</button>
               </div>
 
@@ -360,7 +360,7 @@ export default function Home() {
                   <i className="fas fa-info-circle text-3xl text-white"></i>
                 </div>
                 <div className={`absolute top-2 left-2 ${item.media_type === 'tv' ? 'bg-purple-600' : 'bg-blue-600'} text-white px-2 py-0.5 rounded text-[10px] font-bold shadow z-10 border border-white/20`}>
-                  {item.media_type === 'tv' ? 'SERIE' : 'PELI'}
+                  {item.media_type === 'tv' ? 'SERIE' : 'PELÍCULA'}
                 </div>
                 {getBadgeRight(item)}
               </div>
@@ -424,7 +424,7 @@ export default function Home() {
               <div className="mt-auto">
                 <p className="text-center text-xs text-gray-500 uppercase mb-2">Tu Valoración</p>
                 <div className="grid grid-cols-4 gap-2">
-                  {(['MegaDislike', 'Dislike', 'Like', 'SuperLike'] as const).map((type) => {
+                  {(['Odio', 'Dislike', 'Like', 'SuperLike'] as const).map((type) => {
                     const isSelected = selectedItem.my_score === RATING_MAP[type];
                     return (
                       <button

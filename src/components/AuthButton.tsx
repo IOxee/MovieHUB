@@ -5,6 +5,15 @@ import Link from 'next/link';
 
 type UserInfo = { id: string; email?: string } | null;
 
+const generateUserTag = (email?: string) => {
+  if (!email) return 'Guest';
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) {
+    hash = Math.imul(31, hash) + email.charCodeAt(i) | 0;
+  }
+  return `${Math.abs(hash).toString(36).toUpperCase()}`;
+};
+
 export default function AuthButton() {
   const supabase = getSupabaseBrowser();
   const [user, setUser] = useState<UserInfo>(null);
@@ -39,11 +48,29 @@ export default function AuthButton() {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs text-gray-400">{user.email || 'Usuario'}</span>
-      <button onClick={signOut} className="bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-bold border border-red-700">
-        Salir
-      </button>
+    <div className="relative group">
+       <button className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 px-4 py-2 rounded-lg transition">
+          <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white">
+            {user.email ? user.email[0].toUpperCase() : 'U'}
+          </div>
+          <span className="text-xs font-bold text-gray-300 hidden md:inline-block max-w-[100px] truncate">{generateUserTag(user.email)}</span>
+          <i className="fas fa-chevron-down text-[10px] text-gray-500"></i>
+       </button>
+       
+       <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50 animate-in fade-in slide-in-from-top-2">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden">
+            <div className="p-3 border-b border-gray-800">
+              <p className="text-xs text-gray-500">Conectado como</p>
+              <p className="text-sm font-bold text-white truncate">{generateUserTag(user.email)}</p>
+            </div>
+            <Link href="/profile" className="block px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
+              <i className="fas fa-chart-pie mr-2 text-blue-500"></i> Mis Estadísticas
+            </Link>
+            <button onClick={signOut} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 transition border-t border-gray-800">
+              <i className="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+            </button>
+          </div>
+       </div>
     </div>
   );
 }

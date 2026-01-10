@@ -13,7 +13,7 @@ serve(async (req) => {
     const { title, media_type = 'movie', rating_type, id } = data;
 
     const scoreMap: Record<string, number> = {
-      MegaDislike: -5,
+      Odio: -5,
       Dislike: -2,
       Like: 2,
       SuperLike: 5
