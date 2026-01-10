@@ -83,7 +83,7 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            <div className="max-w-4xl mx-auto px-4 pt-32">
+            <div className="max-w-4xl mx-auto px-4 pt-20 md:pt-32">
                 <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
                     <i className="fas fa-user-astronaut text-blue-500"></i> Tu Perfil
                 </h1>

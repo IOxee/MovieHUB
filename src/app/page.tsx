@@ -55,8 +55,9 @@ export default function Home() {
   const minSliderRef = useRef<HTMLInputElement>(null);
   const maxSliderRef = useRef<HTMLInputElement>(null);
   const debounceTimer = useRef<NodeJS.Timeout>(null);
+  const prevMediaType = useRef(mediaType);
   
-  const supabase = getSupabaseBrowser();
+  const [supabase] = useState(() => getSupabaseBrowser());
 
   // Check auth on mount
   useEffect(() => {
@@ -83,6 +84,9 @@ export default function Home() {
   };
 
   const loadCatalog = useCallback(async (reset = false) => {
+    // Prevent catalog load if we are in recommendations mode and not resetting
+    if (!reset && viewMode === 'recommendations') return;
+
     setLoading(true);
     if (reset) setViewMode('catalog'); // Ensure we are in catalog mode when resetting (filters/search)
     
@@ -120,7 +124,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery, mediaType, minYear, maxYear, supabase]);
+  }, [page, searchQuery, mediaType, minYear, maxYear, supabase, viewMode]);
 
   useEffect(() => {
     fetchStats();
@@ -183,8 +187,15 @@ export default function Home() {
   };
 
   useEffect(() => {
-    loadCatalog(true);
-  }, [mediaType, loadCatalog]);
+    if (prevMediaType.current !== mediaType) {
+        prevMediaType.current = mediaType;
+        if (viewMode === 'recommendations') {
+            getRecommendations();
+        } else {
+            loadCatalog(true);
+        }
+    }
+  }, [mediaType, loadCatalog, viewMode]);
 
   const handleSearch = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -246,7 +257,9 @@ export default function Home() {
     setViewMode('recommendations');
     
     try {
-      const { data, error } = await supabase.functions.invoke('recommend');
+      const { data, error } = await supabase.functions.invoke('recommend', {
+        body: { type: mediaType }
+      });
       if (error) throw error;
       
       const newItems = (data || []).map((item: Item) => ({ ...item, media_type: item.media_type || 'movie' }));
@@ -294,13 +307,25 @@ export default function Home() {
     <>
       <div className="fixed top-0 left-0 w-full bg-gray-950/95 backdrop-blur z-40 border-b border-gray-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            
-            <div className="flex items-center gap-6 w-full md:w-auto">
+          <div className="flex flex-col gap-4">
+            {/* Header Mobile & Desktop */}
+            <div className="flex items-center justify-between w-full relative z-[60]">
               <h1 className="text-2xl font-extrabold tracking-tight cursor-pointer" onClick={() => window.location.reload()}>
                 MEDIA<span className="text-blue-500">HUB</span>
               </h1>
-              <div className="relative flex-grow md:w-64">
+              <div className="flex items-center gap-3 md:hidden relative z-[60]">
+                 <div className="text-right">
+                    <div className="text-sm font-bold text-blue-500 leading-none">{statsCount}</div>
+                    <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Valoraciones</div>
+                 </div>
+                 <div className="relative z-50">
+                    <AuthButton />
+                 </div>
+              </div>
+            </div>
+
+            <div className={`flex flex-col md:flex-row gap-4 items-center justify-between w-full relative z-40 transition-all duration-500 ease-in-out`}>
+               <div className={`relative w-full md:w-64 order-1 ${viewMode === 'recommendations' ? 'hidden' : 'block'}`}>
                 <input type="text" placeholder="Buscar..." 
                   className="w-full bg-gray-900 border border-gray-800 text-sm rounded-full py-2 px-4 pl-10 focus:outline-none focus:border-blue-500"
                   value={searchQuery}
@@ -309,49 +334,78 @@ export default function Home() {
                   />
                 <button onClick={() => loadCatalog(true)} className="absolute left-3 top-2 text-gray-400 text-sm"><i className="fas fa-search"></i></button>
               </div>
-            </div>
 
-            <div className="flex gap-4 items-center w-full md:w-auto justify-center md:justify-end">
-              <div className="flex bg-gray-900 p-1 rounded-lg border border-gray-800 h-9 items-center">
-                <button onClick={() => setFilter('all')} className={`px-4 py-1 text-xs font-bold rounded h-full flex items-center transition-all ${mediaType === 'all' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}>TODO</button>
-                <button onClick={() => setFilter('movie')} className={`px-4 py-1 text-xs font-bold rounded h-full flex items-center transition-all ${mediaType === 'movie' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>PELÍCULAS</button>
-                <button onClick={() => setFilter('tv')} className={`px-4 py-1 text-xs font-bold rounded h-full flex items-center transition-all ${mediaType === 'tv' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>SERIES</button>
-              </div>
+              <div className="flex flex-col sm:flex-row gap-8 sm:gap-4 items-center w-full md:w-auto justify-center md:justify-end order-2">
+                <div className={`flex bg-gray-900 p-1 rounded-lg border border-gray-800 h-9 items-center justify-center w-full sm:w-auto relative z-30 ${viewMode === 'recommendations' ? 'hidden' : 'flex'}`}>
+                    <button onClick={() => setFilter('all')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'all' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}>TODO</button>
+                    <button onClick={() => setFilter('movie')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'movie' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>CINE</button>
+                    <button onClick={() => setFilter('tv')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'tv' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>TV</button>
+                </div>
 
-              <div className="w-48 md:w-64 relative px-2">
-                <div className="timeline-container">
-                  <div className="date-label start">{minYear}</div>
-                  <div className="date-label end">{maxYear}</div>
-                  
-                  <div className="timeline-track"></div>
-                  <div className="timeline-fill" style={getSliderFillStyle()}></div>
-                  
-                  <input type="range" className="range-input" min="1950" max="2026" value={minYear} 
-                    ref={minSliderRef} onChange={(e) => handleSliderChange(e, 'min')} 
-                    onMouseDown={() => bringToFront('min')} onTouchStart={() => bringToFront('min')} />
-                  <input type="range" className="range-input" min="1950" max="2026" value={maxYear}
-                    ref={maxSliderRef} onChange={(e) => handleSliderChange(e, 'max')} 
-                    onMouseDown={() => bringToFront('max')} onTouchStart={() => bringToFront('max')} />
+                <div className={`w-full sm:w-48 md:w-64 relative px-2 h-10 flex items-center z-20 ${viewMode === 'recommendations' ? 'hidden' : 'block'}`}>
+                    <div className="timeline-container mt-0">
+                    <div className="date-label start">{minYear}</div>
+                    <div className="date-label end">{maxYear}</div>
+                    
+                    <div className="timeline-track"></div>
+                    <div className="timeline-fill" style={getSliderFillStyle()}></div>
+                    
+                    <input type="range" className="range-input" min="1950" max="2026" value={minYear} 
+                        ref={minSliderRef} onChange={(e) => handleSliderChange(e, 'min')} 
+                        onMouseDown={() => bringToFront('min')} onTouchStart={() => bringToFront('min')} />
+                    <input type="range" className="range-input" min="1950" max="2026" value={maxYear}
+                        ref={maxSliderRef} onChange={(e) => handleSliderChange(e, 'max')} 
+                        onMouseDown={() => bringToFront('max')} onTouchStart={() => bringToFront('max')} />
+                    </div>
                 </div>
               </div>
-            </div>
 
-            <div className="hidden md:flex gap-3 items-center">
-              <AuthButton />
-              <button onClick={() => getRecommendations()} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105">
-                <i className="fas fa-magic mr-1"></i> IA
-              </button>
-              <div className="text-right ml-2">
-                <div className="text-xl font-bold text-blue-500 leading-none">{statsCount}</div>
-                <div className="text-[8px] uppercase tracking-widest text-gray-500">Votos</div>
+              <div className="hidden md:flex gap-3 items-center order-3">
+                <AuthButton />
+                {viewMode === 'recommendations' ? (
+                 <>
+                   <button onClick={() => loadCatalog(true)} className="bg-gray-700 hover:bg-gray-600 text-white w-10 h-10 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105 flex items-center justify-center">
+                      <i className="fas fa-arrow-left"></i>
+                   </button>
+                   <button onClick={() => getRecommendations()} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105 whitespace-nowrap">
+                      <i className="fas fa-magic mr-1"></i> Otra vez
+                   </button>
+                 </>
+                ) : (
+                 <button onClick={() => getRecommendations()} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105 whitespace-nowrap">
+                    <i className="fas fa-magic mr-1"></i> IA
+                 </button>
+                )}
+                <div className="text-right ml-2">
+                    <div className="text-xl font-bold text-blue-500 leading-none">{statsCount}</div>
+                    <div className="text-[8px] uppercase tracking-widest text-gray-500">Votos</div>
+                </div>
               </div>
+
+              <div className="md:hidden w-full order-4 flex gap-2">
+                  {viewMode === 'recommendations' ? (
+                     <>
+                        <button onClick={() => loadCatalog(true)} className="bg-gray-700 hover:bg-gray-600 text-white w-12 h-10 rounded-lg text-sm font-bold shadow-lg transition flex items-center justify-center">
+                          <i className="fas fa-arrow-left"></i>
+                        </button>
+                        <button onClick={() => getRecommendations()} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition">
+                          <i className="fas fa-magic mr-1"></i> Otra vez
+                        </button>
+                     </>
+                  ) : (
+                     <button onClick={() => getRecommendations()} className="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition">
+                       <i className="fas fa-magic mr-1"></i> Recomendaciones IA
+                     </button>
+                  )}
+              </div>
+
             </div>
           </div>
         </div>
       </div>
 
-      <div className="pt-32 pb-12 max-w-7xl mx-auto px-4 min-h-screen">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      <div className={`pt-32 md:pt-32 pb-12 max-w-7xl mx-auto px-4 min-h-screen transition-all duration-300 ${viewMode === 'recommendations' ? 'pt-36' : 'pt-72'}`}>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-4">
           {catalog.map(item => (
             <div key={item.id} onClick={() => openModal(item)} className="bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-gray-800 relative group cursor-pointer hover:scale-105 transition duration-300">
               <div className="aspect-[2/3] bg-gray-800 relative">

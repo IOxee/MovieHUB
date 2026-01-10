@@ -18,6 +18,7 @@ export default function AuthButton() {
   const supabase = getSupabaseBrowser();
   const [user, setUser] = useState<UserInfo>(null);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -48,8 +49,12 @@ export default function AuthButton() {
   }
 
   return (
-    <div className="relative group">
-       <button className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 px-4 py-2 rounded-lg transition">
+    <div className="relative group" onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            setIsOpen(false);
+        }
+    }}>
+       <button onClick={() => setIsOpen(!isOpen)} className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 px-4 py-2 rounded-lg transition">
           <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white">
             {user.email ? user.email[0].toUpperCase() : 'U'}
           </div>
@@ -57,7 +62,7 @@ export default function AuthButton() {
           <i className="fas fa-chevron-down text-[10px] text-gray-500"></i>
        </button>
        
-       <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50 animate-in fade-in slide-in-from-top-2">
+       <div className={`absolute right-0 top-full pt-2 w-48 z-50 animate-in fade-in slide-in-from-top-2 ${isOpen ? 'block' : 'hidden md:group-hover:block'}`}>
           <div className="bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden">
             <div className="p-3 border-b border-gray-800">
               <p className="text-xs text-gray-500">Conectado como</p>

@@ -21,6 +21,7 @@ serve(async (req) => {
   }
 
   try {
+      const { type } = await req.json().catch(() => ({ type: 'all' }));
       const supabase = createSupabaseClient(req);
       const ratings = await getUserRatings(supabase);
       if (ratings.length === 0) {
@@ -28,7 +29,11 @@ serve(async (req) => {
       }
       
       const seenTitles = new Set(ratings.map(r => r.title));
-      const favorites = ratings.filter(r => r.score >= 2).sort((a, b) => b.score - a.score);
+      let favorites = ratings.filter(r => r.score >= 2).sort((a, b) => b.score - a.score);
+      
+      if (type && type !== 'all') {
+          favorites = favorites.filter(r => r.media_type === type);
+      }
       
       if (favorites.length === 0) {
         return new Response(JSON.stringify([]), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
