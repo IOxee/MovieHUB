@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Media Hub AI",
+  title: "Media Hub",
   description: "Your personalized movie and TV show hub",
+  authors: [{ name: "IOxee", url: "https://ioxee.github.io/" }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

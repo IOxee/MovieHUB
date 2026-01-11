@@ -46,7 +46,7 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [page, setPage] = useState(1);
   const [mediaType, setMediaType] = useState('all');
-  const [minYear, setMinYear] = useState(1970);
+  const [minYear, setMinYear] = useState(1989);
   const [maxYear, setMaxYear] = useState(2026);
   const [searchQuery, setSearchQuery] = useState('');
   const [statsCount, setStatsCount] = useState(0);
@@ -292,7 +292,7 @@ export default function Home() {
           <i className={`fas ${icon}`}></i>
         </div>
       );
-    } else {
+    } else if (isLoggedIn) {
       const score = item.score !== undefined ? item.score : Math.round(item.vote_average * 10);
       const colorClass = score >= 70 ? 'bg-green-500' : (score >= 50 ? 'bg-yellow-500' : 'bg-red-500');
       return (
@@ -301,6 +301,7 @@ export default function Home() {
         </div>
       );
     }
+    return null;
   };
 
   return (
@@ -476,22 +477,30 @@ export default function Home() {
               </div>
 
               <div className="mt-auto">
-                <p className="text-center text-xs text-gray-500 uppercase mb-2">Tu Valoración</p>
-                <div className="grid grid-cols-4 gap-2">
-                  {(['Odio', 'Dislike', 'Like', 'SuperLike'] as const).map((type) => {
-                    const isSelected = selectedItem.my_score === RATING_MAP[type];
-                    return (
-                      <button
-                        key={type}
-                        onClick={() => vote(type)}
-                        disabled={!isLoggedIn}
-                        className={`p-3 rounded-lg text-gray-400 transition flex flex-col items-center border border-transparent ${isSelected ? 'vote-selected' : 'bg-gray-800'} ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-700'}`}
-                      >
-                        <i className={`fas ${ICON_MAP[type]} text-xl`}></i>
-                      </button>
-                    );
-                  })}
-                </div>
+                {isLoggedIn ? (
+                  <>
+                    <p className="text-center text-xs text-gray-500 uppercase mb-2">Tu Valoración</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {(['Odio', 'Dislike', 'Like', 'SuperLike'] as const).map((type) => {
+                        const isSelected = selectedItem.my_score === RATING_MAP[type];
+                        return (
+                          <button
+                            key={type}
+                            onClick={() => vote(type)}
+                            className={`p-3 rounded-lg text-gray-400 transition flex flex-col items-center border border-transparent ${isSelected ? 'vote-selected' : 'bg-gray-800'} hover:bg-gray-700`}
+                          >
+                            <i className={`fas ${ICON_MAP[type]} text-xl`}></i>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                ) : (
+                  <div className="bg-gray-950/50 p-6 rounded-xl border border-gray-800 text-center">
+                     <p className="text-gray-400 text-sm mb-3">Inicia sesión para valorar y obtener recomendaciones personalizadas.</p>
+                     <AuthButton />
+                  </div>
+                )}
               </div>
             </div>
           </div>
