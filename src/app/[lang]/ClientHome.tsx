@@ -210,7 +210,7 @@ export default function Home({ dict, lang }: { dict: any, lang: string }) {
     setProviders([]);
     try {
       const { data, error } = await supabase.functions.invoke('providers', {
-        body: { id: item.id, type: item.media_type }
+        body: { id: item.id, type: item.media_type, lang }
       });
       if (!error && data) {
          setProviders(data);

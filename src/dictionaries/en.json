@@ -1,6 +1,11 @@
 {
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "trafficWarning": "Note: During high traffic, API responses might be slower."
+  },
+  "trafficWarning": {
+      "message": "High traffic may cause API delays.",
+      "close": "Close"
   },
   "searchPlaceholder": "Search...",
   "filters": {
@@ -31,7 +36,7 @@
   },
   "modal": {
     "noDescription": "No description.",
-    "availableIn": "Available in Spain",
+    "availableIn": "Available in",
     "noStreaming": "Not available regarding streaming.",
     "yourRating": "Your Rating",
     "guestMessage": "Log in to rate and get personalized recommendations.",

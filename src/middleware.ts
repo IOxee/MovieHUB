@@ -18,6 +18,16 @@ function getLocale(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Skip internal paths and the auth callback
+  if (
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/auth') || 
+      pathname.startsWith('/api') ||
+      pathname.includes('.')
+  ) {
+      return NextResponse.next();
+  }
+
   // Check for locale
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`

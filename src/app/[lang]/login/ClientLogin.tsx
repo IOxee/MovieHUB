@@ -15,9 +15,7 @@ export default function ClientLogin({ dict, lang }: { dict: any, lang: string })
     setLoading(true);
     setError(null);
     try {
-      const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-      const base = projectRef ? `https://${projectRef}.functions.supabase.co` : '';
-      let redirectUrl = base ? `${base}/auth_callback` : `${window.location.origin}/api/auth/callback`;
+      const redirectUrl = `${window.location.origin}/auth/callback`;
       const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectUrl } });
       if (error) throw error;
       setSent(true);

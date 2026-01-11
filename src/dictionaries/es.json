@@ -1,6 +1,11 @@
 {
   "common": {
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "trafficWarning": "Nota: Con mucho tráfico la API puede ir lenta."
+  },
+  "trafficWarning": {
+    "message": "Si hay mucho tráfico, la API puede dejar de responder temporalmente.",
+    "close": "Cerrar"
   },
   "searchPlaceholder": "Buscar...",
   "filters": {
@@ -31,7 +36,7 @@
   },
   "modal": {
     "noDescription": "Sin descripción.",
-    "availableIn": "Disponible en España",
+    "availableIn": "Disponible en",
     "noStreaming": "No disponible en streaming.",
     "yourRating": "Tu Valoración",
     "guestMessage": "Inicia sesión para valorar y obtener recomendaciones personalizadas.",

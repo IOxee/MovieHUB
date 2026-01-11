@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { i18n } from "@/i18n/settings";
+import { getDictionary } from '@/lib/get-dictionary';
+import TrafficWarning from '@/components/TrafficWarning';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +33,8 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
+  const dict = await getDictionary(lang);
+  
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
@@ -39,7 +43,10 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <TrafficWarning message={dict.trafficWarning.message} closeText={dict.trafficWarning.close} />
+        {children}
+      </body>
     </html>
   );
 }
