@@ -14,7 +14,7 @@ const generateUserTag = (email?: string) => {
   return `${Math.abs(hash).toString(36).toUpperCase()}`;
 };
 
-export default function AuthButton() {
+export default function AuthButton({ dict, lang = 'es' }: { dict?: any, lang?: string }) {
   const supabase = getSupabaseBrowser();
   const [user, setUser] = useState<UserInfo>(null);
   const [loading, setLoading] = useState(true);
@@ -37,13 +37,13 @@ export default function AuthButton() {
   };
 
   if (loading) {
-    return <div className="text-gray-400 text-sm">Cargando…</div>;
+    return <div className="text-gray-400 text-sm">{dict?.common?.loading || 'Cargando...'}</div>;
   }
 
   if (!user) {
     return (
-      <Link href="/login" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-bold border border-white/20">
-        Iniciar sesión
+      <Link href={`/${lang}/login`} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-bold border border-white/20">
+        {dict?.auth?.signInTitle || 'Iniciar sesión'}
       </Link>
     );
   }
@@ -65,14 +65,14 @@ export default function AuthButton() {
        <div className={`absolute right-0 top-full pt-2 w-48 z-50 animate-in fade-in slide-in-from-top-2 ${isOpen ? 'block' : 'hidden md:group-hover:block'}`}>
           <div className="bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden">
             <div className="p-3 border-b border-gray-800">
-              <p className="text-xs text-gray-500">Conectado como</p>
+              <p className="text-xs text-gray-500">{dict?.auth?.connectedAs || 'Conectado como'}</p>
               <p className="text-sm font-bold text-white truncate">{generateUserTag(user.email)}</p>
             </div>
-            <Link href="/profile" className="block px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
-              <i className="fas fa-chart-pie mr-2 text-blue-500"></i> Mis Estadísticas
+            <Link href={`/${lang}/profile`} className="block px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
+              <i className="fas fa-chart-pie mr-2 text-blue-500"></i> {dict?.auth?.myStats || 'Mis Estadísticas'}
             </Link>
             <button onClick={signOut} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 transition border-t border-gray-800">
-              <i className="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+              <i className="fas fa-sign-out-alt mr-2"></i> {dict?.auth?.signOut || 'Cerrar Sesión'}
             </button>
           </div>
        </div>

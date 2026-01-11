@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import AuthButton from '@/components/AuthButton';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { getSupabaseBrowser } from '@/lib/supabase/client';
 
 type Item = {
@@ -40,7 +41,7 @@ const ICON_MAP: Record<RatingType, string> = {
   'Odio': 'fa-skull'
 };
 
-export default function Home() {
+export default function Home({ dict, lang }: { dict: any, lang: string }) { 
   const [catalog, setCatalog] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -88,7 +89,7 @@ export default function Home() {
     if (!reset && viewMode === 'recommendations') return;
 
     setLoading(true);
-    if (reset) setViewMode('catalog'); // Ensure we are in catalog mode when resetting (filters/search)
+    if (reset) setViewMode('catalog'); 
     
     const p = reset ? 1 : page;
     
@@ -226,7 +227,7 @@ export default function Home() {
   const vote = async (ratingType: RatingType) => {
     if (!selectedItem) return;
     if (!isLoggedIn) {
-      alert('Inicia sesión para valorar contenido.');
+      alert(dict.alerts.loginToVote); 
       return;
     }
     
@@ -274,7 +275,7 @@ export default function Home() {
         setCatalog(newItems);
       }
     } catch {
-      alert("Valora más contenido");
+      alert(dict.alerts.rateMore); 
     } finally {
       setLoading(false);
     }
@@ -317,17 +318,18 @@ export default function Home() {
               <div className="flex items-center gap-3 md:hidden relative z-[60]">
                  <div className="text-right">
                     <div className="text-sm font-bold text-blue-500 leading-none">{statsCount}</div>
-                    <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Valoraciones</div>
+                    <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{dict.stats.ratings}</div>
                  </div>
-                 <div className="relative z-50">
-                    <AuthButton />
+                 <div className="relative z-50 flex items-center gap-2">
+                    <LanguageSwitcher />
+                    <AuthButton dict={dict} lang={lang} />
                  </div>
               </div>
             </div>
 
             <div className={`flex flex-col md:flex-row gap-4 items-center justify-between w-full relative z-40 transition-all duration-500 ease-in-out`}>
                <div className={`relative w-full md:w-64 order-1 ${viewMode === 'recommendations' ? 'hidden' : 'block'}`}>
-                <input type="text" placeholder="Buscar..." 
+                <input type="text" placeholder={dict.searchPlaceholder} 
                   className="w-full bg-gray-900 border border-gray-800 text-sm rounded-full py-2 px-4 pl-10 focus:outline-none focus:border-blue-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -338,9 +340,9 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-8 sm:gap-4 items-center w-full md:w-auto justify-center md:justify-end order-2">
                 <div className={`flex bg-gray-900 p-1 rounded-lg border border-gray-800 h-9 items-center justify-center w-full sm:w-auto relative z-30 ${viewMode === 'recommendations' ? 'hidden' : 'flex'}`}>
-                    <button onClick={() => setFilter('all')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'all' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}>TODO</button>
-                    <button onClick={() => setFilter('movie')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'movie' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>CINE</button>
-                    <button onClick={() => setFilter('tv')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'tv' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>TV</button>
+                    <button onClick={() => setFilter('all')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'all' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}>{dict.filters.all}</button>
+                    <button onClick={() => setFilter('movie')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'movie' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>{dict.filters.movies}</button>
+                    <button onClick={() => setFilter('tv')} className={`flex-1 sm:flex-none px-4 py-1 text-xs font-bold rounded h-full flex items-center justify-center transition-all ${mediaType === 'tv' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}>{dict.filters.series}</button>
                 </div>
 
                 <div className={`w-full sm:w-48 md:w-64 relative px-2 h-10 flex items-center z-20 ${viewMode === 'recommendations' ? 'hidden' : 'block'}`}>
@@ -362,24 +364,25 @@ export default function Home() {
               </div>
 
               <div className="hidden md:flex gap-3 items-center order-3">
-                <AuthButton />
+                <LanguageSwitcher />
+                <AuthButton dict={dict} lang={lang} />
                 {viewMode === 'recommendations' ? (
                  <>
                    <button onClick={() => loadCatalog(true)} className="bg-gray-700 hover:bg-gray-600 text-white w-10 h-10 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105 flex items-center justify-center">
                       <i className="fas fa-arrow-left"></i>
                    </button>
                    <button onClick={() => getRecommendations()} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105 whitespace-nowrap">
-                      <i className="fas fa-magic mr-1"></i> Otra vez
+                      <i className="fas fa-magic mr-1"></i> {dict.buttons.again}
                    </button>
                  </>
                 ) : (
                  <button onClick={() => getRecommendations()} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition transform hover:scale-105 whitespace-nowrap">
-                    <i className="fas fa-magic mr-1"></i> IA
+                    <i className="fas fa-magic mr-1"></i> {dict.buttons.aiRecommendations}
                  </button>
                 )}
                 <div className="text-right ml-2">
                     <div className="text-xl font-bold text-blue-500 leading-none">{statsCount}</div>
-                    <div className="text-[8px] uppercase tracking-widest text-gray-500">Votos</div>
+                    <div className="text-[8px] uppercase tracking-widest text-gray-500">{dict.stats.votes}</div>
                 </div>
               </div>
 
@@ -390,12 +393,12 @@ export default function Home() {
                           <i className="fas fa-arrow-left"></i>
                         </button>
                         <button onClick={() => getRecommendations()} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition">
-                          <i className="fas fa-magic mr-1"></i> Otra vez
+                          <i className="fas fa-magic mr-1"></i> {dict.buttons.again}
                         </button>
                      </>
                   ) : (
                      <button onClick={() => getRecommendations()} className="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition">
-                       <i className="fas fa-magic mr-1"></i> Recomendaciones IA
+                       <i className="fas fa-magic mr-1"></i> {dict.buttons.aiRecommendations}
                      </button>
                   )}
               </div>
@@ -415,7 +418,7 @@ export default function Home() {
                   <i className="fas fa-info-circle text-3xl text-white"></i>
                 </div>
                 <div className={`absolute top-2 left-2 ${item.media_type === 'tv' ? 'bg-purple-600' : 'bg-blue-600'} text-white px-2 py-0.5 rounded text-[10px] font-bold shadow z-10 border border-white/20`}>
-                  {item.media_type === 'tv' ? 'SERIE' : 'PELÍCULA'}
+                  {item.media_type === 'tv' ? dict.badges.series : dict.badges.movie}
                 </div>
                 {getBadgeRight(item)}
               </div>
@@ -426,13 +429,13 @@ export default function Home() {
             </div>
           ))}
           {catalog.length === 0 && !loading && (
-            <p className="col-span-full text-center text-gray-500 mt-10">No se encontraron resultados.</p>
+            <p className="col-span-full text-center text-gray-500 mt-10">{dict.alerts.noResults}</p>
           )}
         </div>
         
         {catalog.length > 0 && !searchQuery && (
           <div className="text-center mt-12">
-            <button onClick={loadMore} className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-full font-bold transition border border-gray-700 shadow-lg">Cargar más</button>
+            <button onClick={loadMore} className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-full font-bold transition border border-gray-700 shadow-lg">{dict.buttons.loadMore}</button>
           </div>
         )}
 
@@ -455,14 +458,14 @@ export default function Home() {
               <h2 className="text-3xl font-bold text-white mb-2 leading-tight">{selectedItem.title}</h2>
               <div className="flex items-center gap-3 mb-6 text-sm text-gray-400">
                 <span className="border border-gray-700 px-2 rounded">{selectedItem.release_date ? selectedItem.release_date.split('-')[0] : 'N/A'}</span>
-                <span className="uppercase font-bold text-blue-400">{selectedItem.media_type === 'tv' ? 'Serie TV' : 'Película'}</span>
+                <span className="uppercase font-bold text-blue-400">{selectedItem.media_type === 'tv' ? dict.modal.tvSeries : dict.modal.movie}</span>
                 <span className="text-yellow-500"><i className="fas fa-star"></i> {selectedItem.vote_average?.toFixed(1)}</span>
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed mb-6">{selectedItem.overview || 'Sin descripción.'}</p>
+              <p className="text-gray-300 text-sm leading-relaxed mb-6">{selectedItem.overview || dict.modal.noDescription}</p>
               
               <div className="mb-8 p-4 bg-gray-950/50 rounded-xl border border-gray-800">
                 <h3 className="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg" className="w-4 h-3 rounded-sm" alt="ES" /> Disponible en España
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg" className="w-4 h-3 rounded-sm" alt="ES" /> {dict.modal.availableIn}
                 </h3>
                 <div className="flex flex-wrap gap-3">
                   {loadingProviders ? <i className="fas fa-spinner fa-spin text-blue-500"></i> : (
@@ -471,7 +474,7 @@ export default function Home() {
                         <img src={`https://image.tmdb.org/t/p/original${p.logo}`} className="w-10 h-10 rounded-lg shadow provider-logo" title={p.name} alt={p.name} />
                         <span className="text-[8px] text-gray-400 truncate w-full text-center">{p.type}</span>
                       </div>
-                    )) : <span className="text-xs text-gray-500">No disponible en streaming.</span>
+                    )) : <span className="text-xs text-gray-500">{dict.modal.noStreaming}</span>
                   )}
                 </div>
               </div>
@@ -479,7 +482,7 @@ export default function Home() {
               <div className="mt-auto">
                 {isLoggedIn ? (
                   <>
-                    <p className="text-center text-xs text-gray-500 uppercase mb-2">Tu Valoración</p>
+                    <p className="text-center text-xs text-gray-500 uppercase mb-2">{dict.modal.yourRating}</p>
                     <div className="grid grid-cols-4 gap-2">
                       {(['Odio', 'Dislike', 'Like', 'SuperLike'] as const).map((type) => {
                         const isSelected = selectedItem.my_score === RATING_MAP[type];
@@ -497,8 +500,8 @@ export default function Home() {
                   </>
                 ) : (
                   <div className="bg-gray-950/50 p-6 rounded-xl border border-gray-800 text-center">
-                     <p className="text-gray-400 text-sm mb-3">Inicia sesión para valorar y obtener recomendaciones personalizadas.</p>
-                     <AuthButton />
+                     <p className="text-gray-400 text-sm mb-3">{dict.modal.guestMessage}</p>
+                     <AuthButton dict={dict} />
                   </div>
                 )}
               </div>

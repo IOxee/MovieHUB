@@ -1,0 +1,72 @@
+{
+  "common": {
+    "loading": "Loading..."
+  },
+  "searchPlaceholder": "Search...",
+  "filters": {
+    "all": "ALL",
+    "movies": "MOVIES",
+    "series": "TV"
+  },
+  "stats": {
+    "votes": "Votes",
+    "ratings": "Ratings",
+    "avgScore": "Avg Score"
+  },
+  "buttons": {
+    "loadMore": "Load More",
+    "aiRecommendations": "AI Recommendations",
+    "again": "Again",
+    "backToCatalog": "Back to Catalog",
+    "ai": "AI"
+  },
+  "badges": {
+    "movie": "MOVIE",
+    "series": "SERIES"
+  },
+  "alerts": {
+    "loginToVote": "Log in to rate content.",
+    "rateMore": "Rate more content",
+    "noResults": "No results found."
+  },
+  "modal": {
+    "noDescription": "No description.",
+    "availableIn": "Available in Spain",
+    "noStreaming": "Not available regarding streaming.",
+    "yourRating": "Your Rating",
+    "guestMessage": "Log in to rate and get personalized recommendations.",
+    "movie": "Movie",
+    "tvSeries": "TV Series"
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "magicLinkSent": "We sent you a magic link. Check your email.",
+    "emailPlaceholder": "you@email.com",
+    "sendMagicLink": "Send magic link",
+    "sending": "Sending...",
+    "continueGuest": "Continue as guest",
+    "signOut": "Sign Out",
+    "myStats": "My Stats",
+    "connectedAs": "Connected as",
+    "error": "Something went wrong"
+  },
+  "profile": {
+    "title": "Your Profile",
+    "loginPrompt": "Log in to view your statistics.",
+    "summary": "Summary",
+    "totalVotes": "Total Votes",
+    "avgScore": "Avg Score",
+    "moviesWatched": "Movies",
+    "seriesWatched": "Series",
+    "distribution": "Distribution",
+    "recentRatings": "Recent Ratings",
+    "tableTitle": "Title",
+    "tableType": "Type",
+    "tableScore": "Score",
+    "superLike": "Super Like",
+    "like": "Like",
+    "dislike": "Dislike",
+    "hate": "Hate",
+    "tooltip": "Sum of ratings (Hate, Dislike, Like, Super Like) / total."
+  }
+}

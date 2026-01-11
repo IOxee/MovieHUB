@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getSupabaseBrowser } from '@/lib/supabase/client';
 import AuthButton from '@/components/AuthButton';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 
 type UserStats = {
@@ -16,7 +17,7 @@ type UserStats = {
     recentRatings: any[];
 };
 
-export default function ProfilePage() {
+export default function ProfilePage({ dict, lang }: { dict: any, lang: string }) {
     const [stats, setStats] = useState<UserStats | null>(null);
     const [loading, setLoading] = useState(true);
     const supabase = getSupabaseBrowser();
@@ -76,55 +77,58 @@ export default function ProfilePage() {
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900/20 to-black text-white pb-20">
             <div className="fixed top-0 left-0 w-full bg-gray-950/95 backdrop-blur z-40 border-b border-gray-800 shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-                    <Link href="/" className="text-2xl font-extrabold tracking-tight cursor-pointer">
+                    <Link href={`/${lang}`} className="text-2xl font-extrabold tracking-tight cursor-pointer">
                         MEDIA<span className="text-blue-500">HUB</span>
                     </Link>
-                    <AuthButton />
+                    <div className="flex items-center gap-3">
+                        <LanguageSwitcher />
+                        <AuthButton dict={dict} lang={lang} />
+                    </div>
                 </div>
             </div>
 
             <div className="max-w-4xl mx-auto px-4 pt-20 md:pt-32">
                 <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                    <i className="fas fa-user-astronaut text-blue-500"></i> Tu Perfil
+                    <i className="fas fa-user-astronaut text-blue-500"></i> {dict.profile.title}
                 </h1>
 
                 {!stats ? (
-                    <div className="text-center py-20 text-gray-500">Inicia sesión para ver tus estadísticas.</div>
+                    <div className="text-center py-20 text-gray-500">{dict.profile.loginPrompt}</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg">
-                            <h2 className="text-lg font-bold text-gray-400 mb-4 uppercase text-xs tracking-wider">Resumen</h2>
+                            <h2 className="text-lg font-bold text-gray-400 mb-4 uppercase text-xs tracking-wider">{dict.profile.summary}</h2>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-gray-950 p-4 rounded-xl text-center">
                                     <div className="text-3xl font-bold text-white">{stats.totalRatings}</div>
-                                    <div className="text-[10px] text-gray-500 uppercase font-bold">Votos Totales</div>
+                                    <div className="text-[10px] text-gray-500 uppercase font-bold">{dict.profile.totalVotes}</div>
                                 </div>
                                 <div className="bg-gray-950 p-4 rounded-xl text-center relative group cursor-help">
                                     <i className="fas fa-info-circle absolute top-2 right-2 text-gray-700 hover:text-white transition"></i>
                                     <div className="absolute top-8 right-2 w-48 bg-gray-800 text-xs text-left p-3 rounded-lg shadow-xl border border-gray-700 hidden group-hover:block z-50">
-                                        Suma de puntuaciones<br />(Odio, Dislike, Like, Me Encanta) / total.
+                                        {dict.profile.tooltip}
                                     </div>
                                     <div className="text-3xl font-bold text-yellow-500">{stats.averageScore.toFixed(1)}</div>
-                                    <div className="text-[10px] text-gray-500 uppercase font-bold">Nota Media</div>
+                                    <div className="text-[10px] text-gray-500 uppercase font-bold">{dict.profile.avgScore}</div>
                                 </div>
                                 <div className="bg-gray-950 p-4 rounded-xl text-center">
                                     <div className="text-3xl font-bold text-blue-500">{stats.moviesWatched}</div>
-                                    <div className="text-[10px] text-gray-500 uppercase font-bold">Películas</div>
+                                    <div className="text-[10px] text-gray-500 uppercase font-bold">{dict.profile.moviesWatched}</div>
                                 </div>
                                 <div className="bg-gray-950 p-4 rounded-xl text-center">
                                     <div className="text-3xl font-bold text-purple-500">{stats.seriesWatched}</div>
-                                    <div className="text-[10px] text-gray-500 uppercase font-bold">Series</div>
+                                    <div className="text-[10px] text-gray-500 uppercase font-bold">{dict.profile.seriesWatched}</div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg">
-                            <h2 className="text-lg font-bold text-gray-400 mb-4 uppercase text-xs tracking-wider">Distribución</h2>
+                            <h2 className="text-lg font-bold text-gray-400 mb-4 uppercase text-xs tracking-wider">{dict.profile.distribution}</h2>
                             <div className="space-y-4">
                                 <div>
                                     <div className="flex justify-between text-xs mb-1">
-                                        <span className="text-green-600 font-bold"><i className="fas fa-heart mr-1"></i> Me Encanta</span>
+                                        <span className="text-green-600 font-bold"><i className="fas fa-heart mr-1"></i> {dict.profile.superLike}</span>
                                         <span>{stats.ratingsDistribution.superLike}</span>
                                     </div>
                                     <div className="w-full bg-gray-950 rounded-full h-2">
@@ -133,7 +137,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-xs mb-1">
-                                        <span className="text-green-400 font-bold"><i className="fas fa-thumbs-up mr-1"></i> Like</span>
+                                        <span className="text-green-400 font-bold"><i className="fas fa-thumbs-up mr-1"></i> {dict.profile.like}</span>
                                         <span>{stats.ratingsDistribution.like}</span>
                                     </div>
                                     <div className="w-full bg-gray-950 rounded-full h-2">
@@ -142,7 +146,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-xs mb-1">
-                                        <span className="text-red-400 font-bold"><i className="fas fa-thumbs-down mr-1"></i> Dislike</span>
+                                        <span className="text-red-400 font-bold"><i className="fas fa-thumbs-down mr-1"></i> {dict.profile.dislike}</span>
                                         <span>{stats.ratingsDistribution.dislike}</span>
                                     </div>
                                     <div className="w-full bg-gray-950 rounded-full h-2">
@@ -151,7 +155,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-xs mb-1">
-                                        <span className="text-red-600 font-bold"><i className="fas fa-skull mr-1"></i> Odio</span>
+                                        <span className="text-red-600 font-bold"><i className="fas fa-skull mr-1"></i> {dict.profile.hate}</span>
                                         <span>{stats.ratingsDistribution.odio}</span>
                                     </div>
                                     <div className="w-full bg-gray-950 rounded-full h-2">
@@ -162,14 +166,14 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="col-span-1 md:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg">
-                            <h2 className="text-lg font-bold text-gray-400 mb-4 uppercase text-xs tracking-wider">Últimas Valoraciones</h2>
+                            <h2 className="text-lg font-bold text-gray-400 mb-4 uppercase text-xs tracking-wider">{dict.profile.recentRatings}</h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm text-left text-gray-400">
                                     <thead className="text-xs text-gray-500 uppercase bg-gray-950">
                                         <tr>
-                                            <th className="px-4 py-3 rounded-l-lg">Título</th>
-                                            <th className="px-4 py-3">Tipo</th>
-                                            <th className="px-4 py-3 rounded-r-lg text-right">Nota</th>
+                                            <th className="px-4 py-3 rounded-l-lg">{dict.profile.tableTitle}</th>
+                                            <th className="px-4 py-3">{dict.profile.tableType}</th>
+                                            <th className="px-4 py-3 rounded-r-lg text-right">{dict.profile.tableScore}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -178,7 +182,7 @@ export default function ProfilePage() {
                                                 <td className="px-4 py-3 font-medium text-white">{r.title}</td>
                                                 <td className="px-4 py-3">
                                                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${r.media_type === 'tv' ? 'bg-purple-900 text-purple-200' : 'bg-blue-900 text-blue-200'}`}>
-                                                        {r.media_type === 'tv' ? 'SERIE' : 'PELÍCULA'}
+                                                        {r.media_type === 'tv' ? dict.badges.series : dict.badges.movie}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-right">

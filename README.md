@@ -80,7 +80,7 @@ A fully responsive experience that feels native.
 # 🗺️ Roadmap
 - [ ] Advanced Filtering Options (Genre, Ratings)
 - [ ] User Watchlists & History
-- [ ] Internacionalization (i18n)
+- [x] Internacionalization (i18n)
 - [ ] Dark/Light Theme Toggle
 
 

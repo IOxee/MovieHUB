@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { getSupabaseBrowser } from '@/lib/supabase/client';
 import Link from 'next/link';
 
-export default function LoginPage() {
+export default function ClientLogin({ dict, lang }: { dict: any, lang: string }) {
   const supabase = getSupabaseBrowser();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
@@ -22,7 +22,7 @@ export default function LoginPage() {
       if (error) throw error;
       setSent(true);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Algo salió mal';
+      const message = err instanceof Error ? err.message : dict.auth.error;
       setError(message);
     } finally {
       setLoading(false);
@@ -32,27 +32,27 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white/5 rounded-xl p-6 border border-white/10">
-        <h1 className="text-2xl font-semibold mb-4">Iniciar sesión</h1>
+        <h1 className="text-2xl font-semibold mb-4">{dict.auth.signInTitle}</h1>
         {sent ? (
-          <p className="text-green-400">Te hemos enviado un enlace mágico. Revisa tu email.</p>
+          <p className="text-green-400">{dict.auth.magicLinkSent}</p>
         ) : (
           <form onSubmit={signInWithEmail} className="space-y-4">
             <input
               type="email"
               required
-              placeholder="tu@email.com"
+              placeholder={dict.auth.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-md px-3 py-2 bg-white/10 border border-white/20 focus:outline-none"
             />
             <button disabled={loading} className="w-full rounded-md bg-blue-600 hover:bg-blue-700 transition px-3 py-2">
-              {loading ? 'Enviando…' : 'Enviar enlace mágico'}
+              {loading ? dict.auth.sending : dict.auth.sendMagicLink}
             </button>
           </form>
         )}
         {error && <p className="text-red-400 mt-3">{error}</p>}
         <div className="mt-6 text-sm">
-          <Link href="/" className="underline">Continuar como invitado</Link>
+          <Link href={`/${lang}`} className="underline">{dict.auth.continueGuest}</Link>
         </div>
       </div>
     </div>

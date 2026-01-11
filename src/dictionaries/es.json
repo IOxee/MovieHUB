@@ -1,0 +1,72 @@
+{
+  "common": {
+    "loading": "Cargando..."
+  },
+  "searchPlaceholder": "Buscar...",
+  "filters": {
+    "all": "TODO",
+    "movies": "CINE",
+    "series": "TV"
+  },
+  "stats": {
+    "votes": "Votos",
+    "ratings": "Valoraciones",
+    "avgScore": "Nota Media"
+  },
+  "buttons": {
+    "loadMore": "Cargar más",
+    "aiRecommendations": "Recomendaciones IA",
+    "again": "Otra vez",
+    "backToCatalog": "Volver al Catálogo",
+    "ai": "IA"
+  },
+  "badges": {
+    "movie": "PELÍCULA",
+    "series": "SERIE"
+  },
+  "alerts": {
+    "loginToVote": "Inicia sesión para valorar contenido.",
+    "rateMore": "Valora más contenido",
+    "noResults": "No se encontraron resultados."
+  },
+  "modal": {
+    "noDescription": "Sin descripción.",
+    "availableIn": "Disponible en España",
+    "noStreaming": "No disponible en streaming.",
+    "yourRating": "Tu Valoración",
+    "guestMessage": "Inicia sesión para valorar y obtener recomendaciones personalizadas.",
+    "movie": "Película",
+    "tvSeries": "Serie TV"
+  },
+  "auth": {
+    "signInTitle": "Iniciar sesión",
+    "magicLinkSent": "Te hemos enviado un enlace mágico. Revisa tu email.",
+    "emailPlaceholder": "tu@email.com",
+    "sendMagicLink": "Enviar enlace mágico",
+    "sending": "Enviando...",
+    "continueGuest": "Continuar como invitado",
+    "signOut": "Cerrar Sesión",
+    "myStats": "Mis Estadísticas",
+    "connectedAs": "Conectado como",
+    "error": "Algo salió mal"
+  },
+  "profile": {
+    "title": "Tu Perfil",
+    "loginPrompt": "Inicia sesión para ver tus estadísticas.",
+    "summary": "Resumen",
+    "totalVotes": "Votos Totales",
+    "avgScore": "Nota Media",
+    "moviesWatched": "Películas",
+    "seriesWatched": "Series",
+    "distribution": "Distribución",
+    "recentRatings": "Últimas Valoraciones",
+    "tableTitle": "Título",
+    "tableType": "Tipo",
+    "tableScore": "Nota",
+    "superLike": "Me Encanta",
+    "like": "Like",
+    "dislike": "Dislike",
+    "hate": "Odio",
+    "tooltip": "Suma de puntuaciones (Odio, Dislike, Like, Me Encanta) / total."
+  }
+}
