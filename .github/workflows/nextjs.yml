@@ -14,15 +14,23 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      GITHUB_ACTIONS: ${{ secrets.GITHUB }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY }}
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
+      - name: Debug env
+        run: |
+          echo "GITHUB_ACTIONS=$GITHUB_ACTIONS"
+
       - name: Checkout
         uses: actions/checkout@v4
 
