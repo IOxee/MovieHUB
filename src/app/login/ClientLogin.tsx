@@ -50,7 +50,7 @@ export default function ClientLogin({ dict, lang }: { dict: any, lang: string })
         )}
         {error && <p className="text-red-400 mt-3">{error}</p>}
         <div className="mt-6 text-sm">
-          <Link href={`/${lang}`} className="underline">{dict.auth.continueGuest}</Link>
+          <Link href="/" className="underline">{dict.auth.continueGuest}</Link>
         </div>
       </div>
     </div>

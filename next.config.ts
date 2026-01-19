@@ -1,13 +1,19 @@
 import type { NextConfig } from "next";
 
-const isProd = process.env.NODE_ENV === "production";
+const isGithubPages = process.env.GITHUB === "true";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  ...(isGithubPages && { output: "export" }),
+
   images: { unoptimized: true },
-  env: { NEXT_PUBLIC_BASE_PATH: isProd ? "/MovieHUB" : "" },
-  basePath: isProd ? "/MovieHUB" : "",
-  assetPrefix: isProd ? "/MovieHUB/" : ""
+
+  env: {
+    NEXT_PUBLIC_BASE_PATH: isGithubPages ? "/MovieHUB" : "",
+  },
+
+  basePath: isGithubPages ? "/MovieHUB" : "",
+  assetPrefix: isGithubPages ? "/MovieHUB/" : "",
+  trailingSlash: true
 };
 
 export default nextConfig;

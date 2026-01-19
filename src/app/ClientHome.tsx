@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -321,7 +322,7 @@ export default function Home({ dict, lang }: { dict: any, lang: string }) {
                     <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{dict.stats.ratings}</div>
                  </div>
                  <div className="relative z-50 flex items-center gap-2">
-                    <LanguageSwitcher />
+                    <LanguageSwitcher initialLocale={lang} />
                     <AuthButton dict={dict} lang={lang} />
                  </div>
               </div>
@@ -364,7 +365,7 @@ export default function Home({ dict, lang }: { dict: any, lang: string }) {
               </div>
 
               <div className="hidden md:flex gap-3 items-center order-3">
-                <LanguageSwitcher />
+                <LanguageSwitcher initialLocale={lang} />
                 <AuthButton dict={dict} lang={lang} />
                 {viewMode === 'recommendations' ? (
                  <>

@@ -77,11 +77,11 @@ export default function ProfilePage({ dict, lang }: { dict: any, lang: string })
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900/20 to-black text-white pb-20">
             <div className="fixed top-0 left-0 w-full bg-gray-950/95 backdrop-blur z-40 border-b border-gray-800 shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-                    <Link href={`/${lang}`} className="text-2xl font-extrabold tracking-tight cursor-pointer">
+                    <Link href="/" className="text-2xl font-extrabold tracking-tight cursor-pointer">
                         MEDIA<span className="text-blue-500">HUB</span>
                     </Link>
                     <div className="flex items-center gap-3">
-                        <LanguageSwitcher />
+                        <LanguageSwitcher initialLocale={lang} />
                         <AuthButton dict={dict} lang={lang} />
                     </div>
                 </div>

@@ -42,7 +42,7 @@ export default function AuthButton({ dict, lang = 'es' }: { dict?: any, lang?: s
 
   if (!user) {
     return (
-      <Link href={`/${lang}/login`} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-bold border border-white/20">
+      <Link href="/login" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-bold border border-white/20">
         {dict?.auth?.signInTitle || 'Iniciar sesión'}
       </Link>
     );
@@ -68,7 +68,7 @@ export default function AuthButton({ dict, lang = 'es' }: { dict?: any, lang?: s
               <p className="text-xs text-gray-500">{dict?.auth?.connectedAs || 'Conectado como'}</p>
               <p className="text-sm font-bold text-white truncate">{generateUserTag(user.email)}</p>
             </div>
-            <Link href={`/${lang}/profile`} className="block px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
+            <Link href="/profile" className="block px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
               <i className="fas fa-chart-pie mr-2 text-blue-500"></i> {dict?.auth?.myStats || 'Mis Estadísticas'}
             </Link>
             <button onClick={signOut} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 transition border-t border-gray-800">

@@ -1,5 +1,5 @@
 'use client';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { i18n } from '@/i18n/settings';
 
@@ -8,26 +8,28 @@ const LANGUAGES = {
   es: { name: 'Spanish', flagUrl: 'https://flagcdn.com/w40/es.png' }
 };
 
-export default function LanguageSwitcher() {
-  const pathname = usePathname();
+export default function LanguageSwitcher({ initialLocale }: { initialLocale?: string }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  const segments = pathname.split('/');
-  const currentLocale = segments[1] as keyof typeof LANGUAGES || i18n.defaultLocale;
+  const [currentLocale, setCurrentLocale] = useState<string>(initialLocale || i18n.defaultLocale);
 
-  const redirectedPathName = (locale: string) => {
-    if (!pathname) return '/';
-    const segments = pathname.split('/');
-    segments[1] = locale;
-    return segments.join('/');
-  };
+  useEffect(() => {
+    // If we have an initialLocale prop, we might not need to read the cookie, 
+    // unless the cookie changed elsewhere. But typically prop is truth.
+    // However, for consistency, we could just stay with the prop.
+    // If the prop is missing, we try cookie.
+    if (!initialLocale) {
+        // ... cookie logic
+    }
+  }, [initialLocale]);
 
   const handleLanguageChange = (locale: string) => {
-    const newPath = redirectedPathName(locale);
-    router.push(newPath);
+    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+    setCurrentLocale(locale);
     setIsOpen(false);
+    router.refresh();
   };
 
   useEffect(() => {
@@ -47,12 +49,12 @@ export default function LanguageSwitcher() {
         className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-2 rounded-lg transition"
       >
         <img 
-            src={LANGUAGES[currentLocale]?.flagUrl} 
-            alt={LANGUAGES[currentLocale]?.name} 
+            src={LANGUAGES[currentLocale as keyof typeof LANGUAGES]?.flagUrl} 
+            alt={LANGUAGES[currentLocale as keyof typeof LANGUAGES]?.name} 
             className="w-5 h-3.5 object-cover rounded-[1px]" 
         />
         <span className="text-xs font-bold text-gray-300 hidden md:inline-block">
-          {LANGUAGES[currentLocale]?.name}
+          {LANGUAGES[currentLocale as keyof typeof LANGUAGES]?.name}
         </span>
         <i className={`fas fa-chevron-down text-[10px] text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}></i>
       </button>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { i18n } from "@/i18n/settings";
-import { getDictionary } from '@/lib/get-dictionary';
+import { getDictionary, getLocale } from '@/lib/get-dictionary';
 import TrafficWarning from '@/components/TrafficWarning';
 
 const geistSans = Geist({
@@ -21,19 +21,13 @@ export const metadata: Metadata = {
   authors: [{ name: "IOxee", url: "https://ioxee.github.io/" }],
 };
 
-export async function generateStaticParams() {
-  return i18n.locales.map((locale) => ({ lang: locale }));
-}
-
 export default async function RootLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ lang: string }>;
 }) {
-  const { lang } = await params;
-  const dict = await getDictionary(lang);
+  const lang = await getLocale();
+  const dict = await getDictionary();
   
   return (
     <html lang={lang} suppressHydrationWarning>
